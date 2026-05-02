@@ -1,5 +1,5 @@
-import mongoose from 'mongoose';
-import bcrypt from 'bcryptjs';
+import mongoose from "mongoose";
+import bcrypt from "bcryptjs";
 
 /**
  * TODO: Define User schema
@@ -16,12 +16,39 @@ import bcrypt from 'bcryptjs';
  * - Enable timestamps (createdAt, updatedAt)
  */
 const userSchema = new mongoose.Schema(
-  {
-    // Your schema fields here
-  },
-  {
-    // Schema options here
-  }
+    {
+        // Your schema fields here
+        name: {
+            type: String,
+            trim: true,
+            minlength: 2,
+            maxlength: 50,
+            require: [true, "Name is required"],
+        },
+        email: {
+            type: String,
+            trim: true,
+            required: [true, "Email is required"],
+            unique: true,
+            lowercase: true,
+            validate: (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v),
+        },
+        password: {
+            type: String,
+            required: true,
+            minlength: 6,
+            select: false,
+        },
+        role: {
+            type: String,
+            enum: ["user", "admin"],
+            default: "user",
+        },
+    },
+    {
+        // Schema options here
+        timestamps: true,
+    },
 );
 
 /**
@@ -35,10 +62,21 @@ const userSchema = new mongoose.Schema(
  * Example structure:
  * userSchema.pre('save', async function(next) {
  *   // Only hash if password is modified
- *   
+ *
  *   // Hash password and replace
- *   
+ *
  * });
  */
 
+userSchema.pre("save", async function (next) {
+    if (this.isModified("password")) return next();
+
+    this.password = await bcrypt.hash(this.password, 10);
+});
+
+userSchema.methods.comparePassword = async function (clearTextPassword) {
+    return await bcrypt.compare(clearTextPassword, this.password);
+};
+
 // TODO: Create and export the User model
+export const User = mongoose.model("User", userSchema);
