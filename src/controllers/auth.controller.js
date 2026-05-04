@@ -1,6 +1,6 @@
-import bcrypt from 'bcryptjs';
-import { User } from '../models/user.model.js';
-import { signToken } from '../utils/jwt.js';
+import bcrypt from "bcryptjs";
+import { User } from "../models/user.model.js";
+import { signToken } from "../utils/jwt.js";
 
 /**
  * TODO: Register a new user
@@ -12,11 +12,30 @@ import { signToken } from '../utils/jwt.js';
  * 4. Return 201 with { user } (password excluded by default)
  */
 export async function register(req, res, next) {
-  try {
-    // Your code here
-  } catch (error) {
-    next(error);
-  }
+    try {
+        // Your code here`
+        const { name, email, password } = req.body;
+
+        const existing = await User.findOne({ email });
+
+        if (existing)
+            return res
+                .status(409)
+                .json({ error: { message: "Email already exists" } });
+
+        const user = await User.create({
+            name,
+            email,
+            password,
+        });
+        const userObj = user.toObject();
+
+        delete userObj.password;
+
+        return res.status(201).json({ user: userObj });
+    } catch (error) {
+        next(error);
+    }
 }
 
 /**
@@ -31,11 +50,11 @@ export async function register(req, res, next) {
  * 7. Return 200 with { token, user } (exclude password from user object)
  */
 export async function login(req, res, next) {
-  try {
-    // Your code here
-  } catch (error) {
-    next(error);
-  }
+    try {
+        // Your code here
+    } catch (error) {
+        next(error);
+    }
 }
 
 /**
@@ -45,9 +64,9 @@ export async function login(req, res, next) {
  * 2. Return 200 with { user: req.user }
  */
 export async function me(req, res, next) {
-  try {
-    // Your code here
-  } catch (error) {
-    next(error);
-  }
+    try {
+        // Your code here
+    } catch (error) {
+        next(error);
+    }
 }

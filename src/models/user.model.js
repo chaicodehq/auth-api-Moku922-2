@@ -23,7 +23,7 @@ const userSchema = new mongoose.Schema(
             trim: true,
             minlength: 2,
             maxlength: 50,
-            require: [true, "Name is required"],
+            required: [true, "Name is required"],
         },
         email: {
             type: String,
@@ -31,12 +31,12 @@ const userSchema = new mongoose.Schema(
             required: [true, "Email is required"],
             unique: true,
             lowercase: true,
-            validate: (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v),
+            match: [/^\S+@\S+\.\S+$/, "Invalid email format"],
         },
         password: {
             type: String,
-            required: true,
-            minlength: 6,
+            required: [true, "Password is required"],
+            minlength: [6, "Password must be at least 6 characters"],
             select: false,
         },
         role: {
@@ -69,7 +69,7 @@ const userSchema = new mongoose.Schema(
  */
 
 userSchema.pre("save", async function (next) {
-    if (this.isModified("password")) return next();
+    if (!this.isModified("password")) return next();
 
     this.password = await bcrypt.hash(this.password, 10);
 });
