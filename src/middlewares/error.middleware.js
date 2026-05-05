@@ -23,8 +23,6 @@ export function errorHandler(error, req, res, next) {
         message = "Email already exists";
     }
 
-    console.log(`$$-${message}`);
-
     return res.status(statusCode).json({
         error: { message: message },
     });
