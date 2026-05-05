@@ -28,7 +28,7 @@ export function createApp() {
     });
 
     app.use("/api/auth", authRoutes);
-    app.use("api/users", userRoutes);
+    app.use("/api/users", userRoutes);
 
     app.use(notFound);
     app.use(errorHandler);
